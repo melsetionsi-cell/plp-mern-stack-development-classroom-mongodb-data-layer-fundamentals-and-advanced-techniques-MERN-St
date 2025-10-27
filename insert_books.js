@@ -1,136 +1,121 @@
 // insert_books.js - Script to populate MongoDB with sample book data
 
-// Import MongoDB client
+// Import required modules
+require('dotenv').config();
 const { MongoClient } = require('mongodb');
 
-// Connection URI (replace with your MongoDB connection string if using Atlas)
-const uri = 'mongodb://localhost:27017';
+// Connection settings from .env
+const uri = process.env.MONGODB_URI;
+const dbName = process.env.DATABASE_NAME;
+const collectionName = process.env.COLLECTION_NAME;
 
-// Database and collection names
-const dbName = 'plp_bookstore';
-const collectionName = 'books';
+// Validate environment variables
+if (!uri || !dbName || !collectionName) {
+  console.error('Error: Missing environment variables. Ensure MONGODB_URI, DATABASE_NAME, and COLLECTION_NAME are set in .env');
+  process.exit(1);
+}
 
-// Sample book data
+// Sample book data (10 books)
 const books = [
   {
-    title: 'To Kill a Mockingbird',
-    author: 'Harper Lee',
-    genre: 'Fiction',
-    published_year: 1960,
-    price: 12.99,
+    title: 'Dune',
+    author: 'Frank Herbert',
+    genre: 'Science Fiction',
+    published_year: 1965,
+    price: 15.99,
     in_stock: true,
-    pages: 336,
-    publisher: 'J. B. Lippincott & Co.'
+    pages: 412,
+    publisher: 'Chilton Books'
   },
   {
-    title: '1984',
-    author: 'George Orwell',
-    genre: 'Dystopian',
-    published_year: 1949,
-    price: 10.99,
-    in_stock: true,
-    pages: 328,
-    publisher: 'Secker & Warburg'
-  },
-  {
-    title: 'The Great Gatsby',
-    author: 'F. Scott Fitzgerald',
-    genre: 'Fiction',
-    published_year: 1925,
-    price: 9.99,
-    in_stock: true,
-    pages: 180,
-    publisher: 'Charles Scribner\'s Sons'
-  },
-  {
-    title: 'Brave New World',
-    author: 'Aldous Huxley',
-    genre: 'Dystopian',
-    published_year: 1932,
-    price: 11.50,
-    in_stock: false,
-    pages: 311,
-    publisher: 'Chatto & Windus'
-  },
-  {
-    title: 'The Hobbit',
-    author: 'J.R.R. Tolkien',
+    title: 'The Name of the Wind',
+    author: 'Patrick Rothfuss',
     genre: 'Fantasy',
-    published_year: 1937,
-    price: 14.99,
+    published_year: 2007,
+    price: 13.50,
     in_stock: true,
-    pages: 310,
-    publisher: 'George Allen & Unwin'
+    pages: 662,
+    publisher: 'DAW Books'
   },
   {
-    title: 'The Catcher in the Rye',
-    author: 'J.D. Salinger',
+    title: 'The Bell Jar',
+    author: 'Sylvia Plath',
     genre: 'Fiction',
-    published_year: 1951,
-    price: 8.99,
-    in_stock: true,
-    pages: 224,
-    publisher: 'Little, Brown and Company'
+    published_year: 1963,
+    price: 10.99,
+    in_stock: false,
+    pages: 294,
+    publisher: 'Heinemann'
   },
   {
-    title: 'Pride and Prejudice',
-    author: 'Jane Austen',
-    genre: 'Romance',
-    published_year: 1813,
-    price: 7.99,
+    title: 'Neuromancer',
+    author: 'William Gibson',
+    genre: 'Science Fiction',
+    published_year: 1984,
+    price: 12.75,
+    in_stock: true,
+    pages: 271,
+    publisher: 'Ace Books'
+  },
+  {
+    title: 'The Handmaid\'s Tale',
+    author: 'Margaret Atwood',
+    genre: 'Dystopian',
+    published_year: 1985,
+    price: 11.99,
+    in_stock: true,
+    pages: 311,
+    publisher: 'McClelland & Stewart'
+  },
+  {
+    title: 'Good Omens',
+    author: 'Neil Gaiman, Terry Pratchett',
+    genre: 'Fantasy',
+    published_year: 1990,
+    price: 14.25,
     in_stock: true,
     pages: 432,
-    publisher: 'T. Egerton, Whitehall'
+    publisher: 'Gollancz'
   },
   {
-    title: 'The Lord of the Rings',
-    author: 'J.R.R. Tolkien',
-    genre: 'Fantasy',
-    published_year: 1954,
-    price: 19.99,
-    in_stock: true,
-    pages: 1178,
-    publisher: 'Allen & Unwin'
-  },
-  {
-    title: 'Animal Farm',
-    author: 'George Orwell',
-    genre: 'Political Satire',
-    published_year: 1945,
-    price: 8.50,
-    in_stock: false,
-    pages: 112,
-    publisher: 'Secker & Warburg'
-  },
-  {
-    title: 'The Alchemist',
-    author: 'Paulo Coelho',
-    genre: 'Fiction',
-    published_year: 1988,
-    price: 10.99,
-    in_stock: true,
-    pages: 197,
-    publisher: 'HarperOne'
-  },
-  {
-    title: 'Moby Dick',
-    author: 'Herman Melville',
-    genre: 'Adventure',
-    published_year: 1851,
-    price: 12.50,
-    in_stock: false,
-    pages: 635,
-    publisher: 'Harper & Brothers'
-  },
-  {
-    title: 'Wuthering Heights',
-    author: 'Emily Brontë',
-    genre: 'Gothic Fiction',
-    published_year: 1847,
+    title: 'The Road',
+    author: 'Cormac McCarthy',
+    genre: 'Post-Apocalyptic',
+    published_year: 2006,
     price: 9.99,
+    in_stock: false,
+    pages: 287,
+    publisher: 'Knopf'
+  },
+  {
+    title: 'Sapiens: A Brief History of Humankind',
+    author: 'Yuval Noah Harari',
+    genre: 'Non-Fiction',
+    published_year: 2011,
+    price: 18.99,
     in_stock: true,
-    pages: 342,
-    publisher: 'Thomas Cautley Newby'
+    pages: 443,
+    publisher: 'Harvill Secker'
+  },
+  {
+    title: 'The Martian',
+    author: 'Andy Weir',
+    genre: 'Science Fiction',
+    published_year: 2014,
+    price: 12.99,
+    in_stock: true,
+    pages: 369,
+    publisher: 'Crown Publishing'
+  },
+  {
+    title: 'Circe',
+    author: 'Madeline Miller',
+    genre: 'Fantasy',
+    published_year: 2018,
+    price: 16.50,
+    in_stock: true,
+    pages: 393,
+    publisher: 'Little, Brown and Company'
   }
 ];
 
@@ -147,13 +132,15 @@ async function insertBooks() {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    // Check if collection already has documents
-    const count = await collection.countDocuments();
-    if (count > 0) {
-      console.log(`Collection already contains ${count} documents. Dropping collection...`);
-      await collection.drop();
-      console.log('Collection dropped successfully');
-    }
+    // Drop existing collection to start fresh
+    await collection.drop().catch(err => {
+      if (err.codeName === 'NamespaceNotFound') {
+        console.log('Collection does not exist, proceeding to create new one');
+      } else {
+        throw err;
+      }
+    });
+    console.log('Collection dropped successfully');
 
     // Insert the books
     const result = await collection.insertMany(books);
@@ -177,22 +164,3 @@ async function insertBooks() {
 
 // Run the function
 insertBooks().catch(console.error);
-
-/*
- * Example MongoDB queries you can try after running this script:
- *
- * 1. Find all books:
- *    db.books.find()
- *
- * 2. Find books by a specific author:
- *    db.books.find({ author: "George Orwell" })
- *
- * 3. Find books published after 1950:
- *    db.books.find({ published_year: { $gt: 1950 } })
- *
- * 4. Find books in a specific genre:
- *    db.books.find({ genre: "Fiction" })
- *
- * 5. Find in-stock books:
- *    db.books.find({ in_stock: true })
- */ 

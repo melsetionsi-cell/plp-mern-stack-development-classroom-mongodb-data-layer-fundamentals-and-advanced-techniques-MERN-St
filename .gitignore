@@ -1,0 +1,26 @@
+# Environment variables
+.env
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+package-lock.json
+
+# MongoDB data (if stored locally)
+data/
+mongod.lock
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
